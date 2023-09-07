@@ -285,8 +285,9 @@ module.exports = {
       }
     }
 
-    for (const individualInstruction of (instruction.packageIndividual || [])) {
-      await prepPackageForRelease(individualInstruction, repoUrl, workBranch, releaseVersion, vendor, replaceVersionMap, workingCopyPath);
+    for (const individualPackage of (instruction.packageIndividual || [])) {
+      if (individualPackage.skip) continue
+      await prepPackageForRelease(individualPackage, repoUrl, workBranch, releaseVersion, vendor, replaceVersionMap, workingCopyPath);
     }
 
     for (const packageDirInstruction of (instruction.packageMetaFromDirs || [])) {
@@ -330,6 +331,7 @@ module.exports = {
     }
 
     for (const individualPackage of (instruction.packageIndividual || [])) {
+      if (individualPackage.skip) continue
       const defaults = {excludes: [], composerJsonPath: '', emptyDirsToAdd: []}
       const {label, dir, excludes, composerJsonPath, emptyDirsToAdd} = Object.assign(defaults, individualPackage)
       console.log(`Packaging ${label}`)

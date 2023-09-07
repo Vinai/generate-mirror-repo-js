@@ -22,8 +22,6 @@ async function getPackagesForBuildInstruction(instructions) {
   let toBeBuilt = {};
 
   const {repoUrl} = instructions;
-  
-  
   // use the latest tag in branch ref
   const baseVersionsOnRef = await getLatestTag(repoUrl);
   console.log(`Basing ${repoUrl} package versions on those from tag ${baseVersionsOnRef}`);
@@ -34,8 +32,9 @@ async function getPackagesForBuildInstruction(instructions) {
     toBeBuilt = await determinePackagesForRef(repoUrl, dir, baseVersionsOnRef, {excludes});
     Object.assign(packages, toBeBuilt);
   }
-  
+
   for (const individualPackage of (instructions.packageIndividual || [])) {
+    if (individualPackage.skip) continue;
     const defaults = {excludes: [], composerJsonPath: '', emptyDirsToAdd: []};
     const {label, dir, excludes, composerJsonPath, emptyDirsToAdd} = Object.assign(defaults, individualPackage);
     console.log(`Inspecting ${label}`);
@@ -61,7 +60,7 @@ async function getPackagesForBuildInstruction(instructions) {
     toBeBuilt = await determineMagentoCommunityEditionProject(repoUrl, baseVersionsOnRef);
     Object.assign(packages, toBeBuilt);
   }
-  
+
   repo.clearCache();
   return packages;
 }
@@ -111,7 +110,7 @@ function calcNightlyBuildPackageBaseVersion(version) {
   } else {
     parts[parts.length - 1]++;
   }
-  
+
   return `${parts.join('.')}${suffix}`;
 }
 
@@ -137,6 +136,7 @@ async function processBuildInstruction(instruction, dependencyVersions, fallback
   }
 
   for (const individualPackage of (instruction.packageIndividual || [])) {
+    if (individualPackage.skip) continue
     const defaults = {excludes: [], composerJsonPath: '', emptyDirsToAdd: []};
     const {label, dir, excludes, composerJsonPath, emptyDirsToAdd} = Object.assign(defaults, individualPackage);
     console.log(`Packaging ${label}`);

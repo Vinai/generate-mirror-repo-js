@@ -164,6 +164,7 @@ async function processMirrorInstruction(instructions) {
   }
 
   for (const individualPackage of (instructions.packageIndividual || [])) {
+    if (individualPackage.skip) continue
     const defaults = {excludes: [], composerJsonPath: '', emptyDirsToAdd: []};
     const {label, dir, excludes, composerJsonPath, emptyDirsToAdd} = Object.assign(defaults, individualPackage);
     console.log(`Packaging ${label}`);
