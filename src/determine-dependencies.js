@@ -26,7 +26,9 @@ async function copyFilesToWorkDir(dir, workDir) {
 
 async function composerInstall(workingDir) {
   return new Promise((resolve, reject) => {
-    const command = 'composer install --no-progress --no-plugins --no-scripts';
+    // No repository-url is needed because all packages contained in this repo are replaced in the composer.json, and
+    // third-party packages will be installed form packagist.org.
+    const command = `composer install --ignore-platform-reqs --no-progress --no-plugins --no-scripts`;
     console.log(`Running ${command}`);
     const bufferBytes = 4 * 1024 * 1024; // 4M
     childProcess.exec(command, {maxBuffer: bufferBytes, cwd: workingDir}, (error, stdout, stderr) => {

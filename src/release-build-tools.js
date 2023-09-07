@@ -25,7 +25,7 @@ function fsExists(dirOrFile) {
 
 async function composerCreateMagentoProject(version) {
   console.log(`Determining upstream package versions for release ${version}...`);
-  const workDir = `${tmpdir()}/workdir-${version}`;
+  const workDir = `${tmpdir()}/workdir-project-${version}`;
   return new Promise((resolve, reject) => {
     if (fsExists(workDir)) {
       console.log(`Found existing installation at ${workDir}`)
