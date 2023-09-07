@@ -21,14 +21,18 @@ const {
   createPackageForRef,
   createMetaPackageFromRepoDir
 } = require("../package-modules");
+
 if (options.buildConfig) {
   if (! options.buildConfig.startsWith('/')) {
     options.buildConfig = path.join(process.cwd(), options.buildConfig);
   }
 }
-const buildConfigModule = options.buildConfig || '../build-config/mageos-release-build-config';
-const {buildConfig: releaseInstructions} = require(buildConfigModule);
+const packagesConfig = require('../build-config/packages-config');
+const {mergeBuildConfigs} = require('../utils');
 
+const buildConfigModule = options.buildConfig || '../build-config/mageos-release-build-config';
+const releaseBuildConfig = require(buildConfigModule);
+const releaseInstructions = mergeBuildConfigs(packagesConfig, releaseBuildConfig);
 
 if (options.help) {
   console.log(`Build Mage-OS release packages from github.com/mage-os git repositories.
