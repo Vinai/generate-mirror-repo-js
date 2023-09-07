@@ -1,5 +1,6 @@
 const repo = require('./../repository');
 const parseOptions = require('parse-options');
+const path = require("path");
 const {
   getPackageVersionMap,
   prepRelease,
@@ -7,6 +8,12 @@ const {
   validateVersionString,
   buildMageOsProductCommunityEditionMetapackage
 } = require('./../release-build-tools');
+
+const options = parseOptions(
+  `$outputDir $gitRepoDir $repoUrl $mageosVendor $mageosRelease $upstreamRelease $buildConfig @help|h`,
+  process.argv
+);
+
 const {
   setArchiveBaseDir,
   setMageosPackageRepoUrl,
@@ -14,12 +21,13 @@ const {
   createPackageForRef,
   createMetaPackageFromRepoDir
 } = require("../package-modules");
-const {buildConfig: releaseInstructions} = require('./../build-config/mageos-release-build-config');
-
-const options = parseOptions(
-  `$outputDir $gitRepoDir $repoUrl $mageosVendor $mageosRelease $upstreamRelease @help|h`,
-  process.argv
-);
+if (options.buildConfig) {
+  if (! options.buildConfig.startsWith('/')) {
+    options.buildConfig = path.join(process.cwd(), options.buildConfig);
+  }
+}
+const buildConfigModule = options.buildConfig || '../build-config/mageos-release-build-config';
+const {buildConfig: releaseInstructions} = require(buildConfigModule);
 
 
 if (options.help) {
@@ -29,6 +37,7 @@ Usage:
   node src/make/mageos-release.js [OPTIONS]
 
 Options:
+  --buildConfig=     JS module path to build configuration file (default: build-config/mageos-release-build-config)
   --outputDir=       Dir to contain the built packages (default: packages)
   --gitRepoDir=      Dir to clone repositories into (default: repositories)
   --repoUrl=         Composer repository URL to use in base package (default: https://repo.mage-os.org/)
