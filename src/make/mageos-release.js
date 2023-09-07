@@ -27,6 +27,7 @@ if (options.buildConfig) {
     options.buildConfig = path.join(process.cwd(), options.buildConfig);
   }
 }
+global.scriptDir = path.resolve(__dirname, '../..')
 const packagesConfig = require('../build-config/packages-config');
 const {mergeBuildConfigs} = require('../utils');
 

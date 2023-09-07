@@ -5,7 +5,7 @@ module.exports = {
     packageIndividual: [
       {
         label: 'Magento Base Package',
-        composerJsonPath: `${__dirname}/../../resource/composer-templates/mage-os/magento2-base/template.json`,
+        composerJsonPath: `${scriptDir}/resource/composer-templates/mage-os/magento2-base/template.json`,
       }
     ]
   },
