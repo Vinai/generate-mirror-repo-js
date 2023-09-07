@@ -10,6 +10,7 @@ const {readComposerJson, createMagentoCommunityEditionMetapackage,
   createMetaPackageFromRepoDir,
   createMagentoCommunityEditionProject
 } = require('./package-modules');
+const {createWorkDir} = require('./determine-dependencies')
 
 
 function fsExists(dirOrFile) {
@@ -30,6 +31,7 @@ async function composerCreateMagentoProject(version) {
       console.log(`Found existing installation at ${workDir}`)
       resolve(workDir)
     } else {
+      // TODO: make repo URL configurable
       const command = `composer create-project --ignore-platform-reqs --repository-url https://mirror.mage-os.org magento/project-community-edition ${workDir} ${version}`
       console.log(`Running ${command}`)
       const bufferBytes = 4 * 1024 * 1024; // 4M
@@ -174,8 +176,13 @@ function updateComposerConfigFromMagentoToMageOs(composerConfig, releaseVersion,
   updateComposerPluginConfigForMageOs(composerConfig, vendor)
 }
 
-async function prepPackageForRelease({label, dir}, repoUrl, ref, releaseVersion, vendor, replaceVersionMap, workingCopyPath) {
+async function prepPackageForRelease({label, dir, composerJsonPath}, repoUrl, ref, releaseVersion, vendor, replaceVersionMap, workingCopyPath) {
   console.log(`Preparing ${label}`);
+
+
+  if ((composerJsonPath || '').endsWith('template.json')) {
+    await createWorkDir(workingCopyPath)
+  }
 
   const composerConfig = JSON.parse(await readComposerJson(repoUrl, dir, ref))
   updateComposerConfigFromMagentoToMageOs(composerConfig, releaseVersion, replaceVersionMap, vendor)
@@ -242,6 +249,7 @@ module.exports = {
     const workBranch = `prep-release/${vendor}-${releaseVersion}`;
 
     const workingCopyPath = await repo.pull(repoUrl, ref);
+
     await repo.createBranch(repoUrl, workBranch, ref);
 
     for (const packageDirInstruction of (instruction.packageDirs || [])) {
