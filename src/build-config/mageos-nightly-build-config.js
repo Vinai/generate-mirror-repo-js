@@ -1,8 +1,4 @@
-
-const packagesConfig = require('./packages-config');
-const {mergeBuildConfigs} = require('../utils');
-
-const branchBuildConfig = {
+module.exports = {
   'magento2': {
     repoUrl: 'https://github.com/mage-os/mageos-magento2.git',
     ref: '2.4-develop',
@@ -105,8 +101,4 @@ const branchBuildConfig = {
     repoUrl: 'https://github.com/mage-os/mageos-magento-zend-memory.git',
     ref: 'main'
   },
-};
-
-module.exports = {
-  buildConfig: mergeBuildConfigs(packagesConfig, branchBuildConfig)
 };
