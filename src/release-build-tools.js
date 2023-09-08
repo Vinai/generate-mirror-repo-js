@@ -176,7 +176,11 @@ function updateComposerConfigFromMagentoToMageOs(composerConfig, releaseVersion,
   updateComposerPluginConfigForMageOs(composerConfig, vendor)
 }
 
-async function prepPackageForRelease({label, dir, composerJsonPath}, repoUrl, ref, releaseVersion, vendor, replaceVersionMap, workingCopyPath) {
+async function prepPackageForRelease({label, dir, composerJsonPath, skip}, repoUrl, ref, releaseVersion, vendor, replaceVersionMap, workingCopyPath) {
+  if (skip) {
+    console.log(`Skipping ${label}`);
+    return;
+  }
   console.log(`Preparing ${label}`);
 
 
