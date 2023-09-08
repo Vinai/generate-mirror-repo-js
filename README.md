@@ -125,6 +125,9 @@ custom build config file anywhere. Start with a copy of `src/build-config/mageos
 - copy `resources/composer-templates/mage-os/product-community-edition/dependencies-template.json` to `mage-os/product-community-edition` inside your custom composer templates directory
 
 #### Removing packages from a monorepo source
+
+:warning: The following prevents packages to be built, but they will still be required in the product metapackage composer.json. It is also necessary to remove them from `replace` in the source monorepo composer.json and make sure that the BASE package does not depend on their code directly or indirectly.
+
 - for packages that are defined explicitly as individual package in `packages-config.js`: inside the configuration for the monorepo (e.g. `magento2`), add package with `skip:true` under `packageIndividual`, e.g.
     ```
     // removing packages outside of app/code that are explicitly configured in packages-config.js:
@@ -133,8 +136,15 @@ custom build config file anywhere. Start with a copy of `src/build-config/mageos
         skip: true,
     }
     ```
-- for packages, implicitly contained via `packageDirs`, e.g. all modules in `app/code` of the `magento2` monorepo: no build configuration is necessary, remove the directory from the source repository instead.
-  - :warning: it only works if the package is not a dependency of another installed package
+- for packages, implicitly contained via `packageDirs`, e.g. all modules in `app/code` of the `magento2` monorepo, use the `excludes` configuration, e.g.:
+  ```
+    packageDirs: [
+      {
+        dir: 'app/code/Magento',
+        excludes: ['app/code/Magento/Customer']
+      },
+    ],
+  ```
 
 #### Removing a whole repository
 - remove the whole entry from the build configuration (e.g. `adobe-stock-integration`). The default configuration is only merged for repositories that are configured in the build config, so it will be ignored.
