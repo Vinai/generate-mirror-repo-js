@@ -2,6 +2,10 @@ module.exports = {
   'magento2': {
     repoUrl: 'https://github.com/mage-os/mageos-magento2.git',
     ref: '2.4-develop',
+    // This path can be overridden in custom build configs. If it is not configured or a file does exist in the custom
+    // path, getAdditionalDependencies() always falls back to resource/composer-templates
+
+    // composerTemplatesPath: path.join(__dirname, '../../resource/composer-templates'),
     packageIndividual: [
       {
         label: 'Magento Base Package',

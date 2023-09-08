@@ -108,6 +108,40 @@ chmod +x /usr/local/bin/php-classes.phar
 
 Check the corresponding workflows in `.github/workflows` for details on how to run the generation.
 
+## Generating Mage-OS distributions (experimental)
+
+To create a custom distribution, use the `src/make/mageos-release.js` script with `--buildConfig` option pointing to a
+custom build config file anywhere. Start with a copy of `src/build-config/mageos-release-build-config.js`
+
+### Build configuration guide
+
+#### Use different source repositories
+- change `repoUrl` and `ref` for the respective module
+- this could be a different branch or a fork of the monorepo where specific modules are removed from `composer.json` and `app/code` that should not be built and included.
+
+#### Removing metapackage dependencies (e.g. inventory):
+- change `composerTemplatesPath` inside `magento2`: This path can be overridden in custom build configs. If it is not configured or a file does exist in the custom
+ // path, getAdditionalDependencies() always falls back to resource/composer-templates
+- copy `resources/composer-templates/mage-os/product-community-edition/dependencies-template.json` to `mage-os/product-community-edition` inside your custom composer templates directory
+
+#### Removing packages from a monorepo source
+- for packages that are defined explicitly as individual package in `packages-config.js`: inside the configuration for the monorepo (e.g. `magento2`), add package with `skip:true` under `packageIndividual`, e.g.
+    ```
+    // removing packages outside of app/code that are explicitly configured in packages-config.js:
+    {
+        dir: 'app/design/frontend/Magento/luma',
+        skip: true,
+    }
+    ```
+- for packages, implicitly contained via `packageDirs`, e.g. all modules in `app/code` of the `magento2` monorepo: no build configuration is necessary, remove the directory from the source repository instead.
+  - :warning: it only works if the package is not a dependency of another installed package
+
+#### Removing a whole repository
+- remove the whole entry from the build configuration (e.g. `adobe-stock-integration`). The default configuration is only merged for repositories that are configured in the build config, so it will be ignored.
+
+### Removing package directories or metapackages from a monorepo without removing the whole repo
+- Add `skip: true` to the respective element in `packageMetaFromDirs` or `packageDirs` for this repository
+
 ## Generating custom releases based on Mage-OS
 
 Currently, the manual generation approach needs to be used to create custom releases.  
@@ -116,7 +150,6 @@ Two things are required:
 * Specify a custom vendor name using the `--mageosVendor=extreme-commerce` option
 * Provide custom meta-package dependency templates in `resource/composer-templates/{vendor-name}/`  
   See the existing ones in `resource/composer-templates/mage-os` for examples.  
-  In future it will be possible to specify the composer-templates path with a command line argument.
 
 
 ## Building the docker image
