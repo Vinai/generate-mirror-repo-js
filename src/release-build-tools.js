@@ -198,13 +198,14 @@ async function prepPackageForRelease({label, dir, composerJsonPath, skip}, repoU
 
 
 async function buildMageOsProductCommunityEditionMetapackage(releaseVersion, instruction, replaceVersionMap, vendor) {
-  const {ref, repoUrl} = instruction
+  const {ref, repoUrl, composerTemplatesPath} = instruction
 
   console.log('Packaging Mage-OS Community Edition Product Metapackage');
 
   return createMagentoCommunityEditionMetapackage(repoUrl, ref, {
     release: releaseVersion,
     vendor,
+    composerTemplatesPath,
     dependencyVersions: {'*': releaseVersion},
     transform: {
       [`${vendor}/product-community-edition`]: [
@@ -218,13 +219,14 @@ async function buildMageOsProductCommunityEditionMetapackage(releaseVersion, ins
 }
 
 async function buildMageOsProjectCommunityEditionMetapackage(releaseVersion, instruction, replaceVersionMap, vendor, dependencyVersions) {
-  const {ref, repoUrl} = instruction
+  const {ref, repoUrl, composerTemplatesPath} = instruction
 
   console.log('Packaging Mage-OS Community Edition Project');
 
   return createMagentoCommunityEditionProject(repoUrl, ref, {
     release: releaseVersion,
     vendor,
+    composerTemplatesPath,
     dependencyVersions,
     minimumStability: 'stable',
     description: 'Community built eCommerce Platform for Growth',

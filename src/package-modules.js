@@ -380,12 +380,15 @@ async function getLatestDependencies(dir) {
   }, Promise.resolve({}));
 }
 
-async function getAdditionalDependencies(packageName, ref) {
+async function getAdditionalDependencies(packageName, ref, composerTemplatesPath) {
   const dir = `${__dirname}/../resource/history/${packageName}`;
   const file = `${dir}/${ref}.json`;
+  const templateDir = fs.existsSync(path.join(composerTemplatesPath, packageName))
+    ? path.join(composerTemplatesPath, packageName)
+    : path.join(__dirname, '/../resource/composer-templates', packageName)
   return fs.existsSync(file)
     ? JSON.parse(fs.readFileSync(file, 'utf8')).require
-    : await getLatestDependencies(`${__dirname}/../resource/composer-templates/${packageName}`);
+    : getLatestDependencies(templateDir);
 }
 
 async function findModulesToBuild(url, modulesPath, ref, excludes) {
@@ -456,7 +459,7 @@ async function determineMagentoCommunityEditionMetapackage(repoUrl, ref, release
  * @returns {Promise<{}>}
  */
 async function createMagentoCommunityEditionMetapackage(url, ref, options) {
-  const {release, dependencyVersions, transform, vendor} = Object.assign({
+  const {release, dependencyVersions, transform, vendor, composerTemplatesPath} = Object.assign({
     release: undefined,
     dependencyVersions: {},
     vendor: 'magento'
@@ -468,7 +471,7 @@ async function createMagentoCommunityEditionMetapackage(url, ref, options) {
     files
   } = await createComposerJsonOnlyPackage(url, ref, packageName, async (refComposerConfig) => {
 
-    const additionalDependencies = await getAdditionalDependencies(packageName, ref) // read release-history or dependencies-template for product metapackage
+    const additionalDependencies = await getAdditionalDependencies(packageName, ref, composerTemplatesPath) // read release-history or dependencies-template for product metapackage
 
     const composerConfig = Object.assign({}, refComposerConfig, {
       name: packageName,
@@ -514,12 +517,12 @@ async function createMagentoCommunityEditionProject(url, ref, options) {
     vendor: 'magento',
     description: 'eCommerce Platform for Growth (Community Edition)',
   };
-  const {release, dependencyVersions, minimumStability, transform, vendor, description} = Object.assign(defaults, (options || {}))
+  const {release, dependencyVersions, minimumStability, transform, vendor, description, composerTemplatesPath} = Object.assign(defaults, (options || {}))
   const name = `${vendor}/project-community-edition`;
   const version = release || dependencyVersions[name] || ref;
   const {packageFilepath, files} = await createComposerJsonOnlyPackage(url, ref, name, async (refComposerConfig) => {
 
-    const additionalDependencies = await getAdditionalDependencies(name, ref) // read release history or dependencies-template for project metapackage
+    const additionalDependencies = await getAdditionalDependencies(name, ref, composerTemplatesPath) // read release history or dependencies-template for project metapackage
 
     const composerConfig = Object.assign(refComposerConfig, {
       name: name,
