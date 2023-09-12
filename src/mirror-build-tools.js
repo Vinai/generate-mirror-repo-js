@@ -157,6 +157,7 @@ async function processMirrorInstruction(instructions) {
   );
 
   for (const packageDir of (instructions.packageDirs || [])) {
+    if (packageDir.skip) continue;
     const {label, dir, excludes} = Object.assign({excludes: []}, packageDir);
     console.log(`Packaging ${label}`);
     tags = await createPackagesSinceTag(repoUrl, tagsSpec, dir, excludes, fixVersions, transform)
@@ -173,6 +174,7 @@ async function processMirrorInstruction(instructions) {
   }
 
   for (const packageMeta of (instructions.packageMetaFromDirs || [])) {
+    if (packageMeta.skip) continue;
     const {label, dir} = packageMeta;
     console.log(`Packaging ${label}`);
     tags = await createMetaPackagesFromRepoDir(repoUrl, tagsSpec, dir, fixVersions, transform);

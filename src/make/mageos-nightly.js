@@ -2,7 +2,13 @@ const repo = require('./../repository');
 const parseOptions = require('parse-options');
 const {setArchiveBaseDir, setMageosPackageRepoUrl} = require('./../package-modules');
 const {processBuildInstructions} = require('./../release-branch-build-tools');
-const {buildConfig: branchBuildInstructions} = require('./../build-config/mageos-nightly-build-config');
+
+const packagesConfig = require('../build-config/packages-config');
+const {mergeBuildConfigs} = require('../utils');
+
+const branchBuildConfig = require('./../build-config/mageos-nightly-build-config');
+const branchBuildInstructions = mergeBuildConfigs(packagesConfig, branchBuildConfig);
+
 
 const options = parseOptions(
   `$outputDir $gitRepoDir $repoUrl @help|h`,

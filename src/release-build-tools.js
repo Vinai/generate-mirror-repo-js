@@ -176,7 +176,11 @@ function updateComposerConfigFromMagentoToMageOs(composerConfig, releaseVersion,
   updateComposerPluginConfigForMageOs(composerConfig, vendor)
 }
 
-async function prepPackageForRelease({label, dir, composerJsonPath}, repoUrl, ref, releaseVersion, vendor, replaceVersionMap, workingCopyPath) {
+async function prepPackageForRelease({label, dir, composerJsonPath, skip}, repoUrl, ref, releaseVersion, vendor, replaceVersionMap, workingCopyPath) {
+  if (skip) {
+    console.log(`Skipping ${label}`);
+    return;
+  }
   console.log(`Preparing ${label}`);
 
 
@@ -194,13 +198,14 @@ async function prepPackageForRelease({label, dir, composerJsonPath}, repoUrl, re
 
 
 async function buildMageOsProductCommunityEditionMetapackage(releaseVersion, instruction, replaceVersionMap, vendor) {
-  const {ref, repoUrl} = instruction
+  const {ref, repoUrl, composerTemplatesPath} = instruction
 
   console.log('Packaging Mage-OS Community Edition Product Metapackage');
 
   return createMagentoCommunityEditionMetapackage(repoUrl, ref, {
     release: releaseVersion,
     vendor,
+    composerTemplatesPath,
     dependencyVersions: {'*': releaseVersion},
     transform: {
       [`${vendor}/product-community-edition`]: [
@@ -214,13 +219,14 @@ async function buildMageOsProductCommunityEditionMetapackage(releaseVersion, ins
 }
 
 async function buildMageOsProjectCommunityEditionMetapackage(releaseVersion, instruction, replaceVersionMap, vendor, dependencyVersions) {
-  const {ref, repoUrl} = instruction
+  const {ref, repoUrl, composerTemplatesPath} = instruction
 
   console.log('Packaging Mage-OS Community Edition Project');
 
   return createMagentoCommunityEditionProject(repoUrl, ref, {
     release: releaseVersion,
     vendor,
+    composerTemplatesPath,
     dependencyVersions,
     minimumStability: 'stable',
     description: 'Community built eCommerce Platform for Growth',

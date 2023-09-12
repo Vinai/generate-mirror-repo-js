@@ -1,15 +1,15 @@
-
-const packagesConfig = require('./packages-config');
-const {mergeBuildConfigs} = require('../utils');
-
-const releaseBuildConfig = {
+module.exports = {
   'magento2': {
     repoUrl: 'https://github.com/mage-os/mageos-magento2.git',
     ref: '2.4-develop',
+    // This path can be overridden in custom build configs. If it is not configured or a file does exist in the custom
+    // path, getAdditionalDependencies() always falls back to resource/composer-templates
+
+    // composerTemplatesPath: path.join(__dirname, '../../resource/composer-templates'),
     packageIndividual: [
       {
         label: 'Magento Base Package',
-        composerJsonPath: `${__dirname}/../../resource/composer-templates/mage-os/magento2-base/template.json`,
+        composerJsonPath: `${scriptDir}/resource/composer-templates/mage-os/magento2-base/template.json`,
       }
     ]
   },
@@ -89,8 +89,4 @@ const releaseBuildConfig = {
     repoUrl: 'https://github.com/mage-os/mageos-magento-zend-memory.git',
     ref: 'main'
   },
-};
-
-module.exports = {
-  buildConfig: mergeBuildConfigs(packagesConfig, releaseBuildConfig)
 };
